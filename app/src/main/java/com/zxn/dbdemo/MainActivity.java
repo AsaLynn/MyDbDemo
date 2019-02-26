@@ -39,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @OnClick({R.id.btn_insert, R.id.btn_update, R.id.btn_select})
+    //btn_select_single
+    @OnClick({R.id.btn_insert, R.id.btn_update, R.id.btn_update2, R.id.btn_select, R.id.btn_select_one, R.id.btn_select_single})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_insert:
@@ -57,25 +58,120 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
             case R.id.btn_update:
-                //update(String table, ContentValues values, String whereClause, String[] whereArgs)+
-                ContentValues values = new ContentValues();
-                values.put(MySQLiteDBHelper.TODAY, "2019" + 10);
-                values.put(MySQLiteDBHelper.DATE, 10);
-                values.put(MySQLiteDBHelper.STEP, 100);
-                String whereClause = "";
-                String[] whereArgs = {};
-                //writableDatabase.update(MySQLiteDBHelper.TABLE_NAME, values, );
+                update();
+                break;
+            case R.id.btn_update2:
+                update2();
                 break;
             case R.id.btn_select:
                 //rawQuery(String sql, String[] selectionArgs)
-                String sql = "";
+                String sql = "select * from " + MySQLiteDBHelper.TABLE_NAME;
                 String[] selectionArgs = {};
                 Cursor cursor = readableDatabase.rawQuery(sql, selectionArgs);
                 while (cursor.moveToNext()) {
-                    String string = cursor.getString(0);
-                    Log.i(TAG, "onViewClicked: " + string);
+                    //String string = cursor.getString(0);
+                    //Log.i(TAG, "onViewClicked: " + string);
+                    //String string1 = cursor.getString(1);
+                    //Log.i(TAG, "onViewClicked: " + string1);
+                    String[] columnNames = cursor.getColumnNames();
+
+                    for (String name : columnNames) {
+                        int columnIndex = cursor.getColumnIndex(name);
+                        String value = cursor.getString(columnIndex);
+                        Log.i(TAG, "onViewClicked: " + name + "-->" + value);
+                    }
                 }
                 break;
+            case R.id.btn_select_one:
+                selectOne();
+                break;
+            case R.id.btn_select_single:
+                selectSingle();
+                break;
+
         }
     }
+
+    private void update2() {
+        String sql = "update TodayStepData set step = 500 where _id=(select _id from TodayStepData where today = 20190 order by _id desc limit 1)";
+        writableDatabase.execSQL(sql);
+    }
+
+    private void update() {
+
+         /*String sql = "select * from " + MySQLiteDBHelper.TABLE_NAME;
+                String[] selectionArgs = {};
+                Cursor cursor = readableDatabase.rawQuery(sql, selectionArgs);*/
+
+        //update(String table, ContentValues values, String whereClause, String[] whereArgs)+
+        ContentValues values = new ContentValues();
+        //values.put(MySQLiteDBHelper.TODAY, "2019" + 10);
+        //values.put(MySQLiteDBHelper.DATE, 10);
+        values.put(MySQLiteDBHelper.STEP, 100);
+        String whereClause = "today = ?";
+        String[] whereArgs = {"20190"};
+        writableDatabase.update(MySQLiteDBHelper.TABLE_NAME, values, whereClause, whereArgs);
+    }
+
+    private void selectSingle() {
+//        query(String table, String[] columns, String selection,
+//                String[] selectionArgs, String groupBy, String having,
+//                String orderBy, String limit)
+        String orderBy = "_id desc";
+        String limit = "1";
+        String selection = "today = ?";
+        String[] selectionArgs = {"20190"};
+        Cursor cursor
+                = readableDatabase
+                .query(MySQLiteDBHelper.TABLE_NAME,
+                        null,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        orderBy,
+                        limit);
+        if (cursor.moveToFirst()) {
+            int columnIndex = cursor.getColumnIndex("_id");
+            String idValue = cursor.getString(columnIndex);
+            int stepIndex = cursor.getColumnIndex("step");
+            String stepValue = cursor.getString(stepIndex);
+            Log.i(TAG, "onViewClicked: step-->" + stepValue);
+            Log.i(TAG, "onViewClicked: idValue-->" + idValue);
+        }
+
+        /*while (cursor.moveToNext()) {
+            String[] columnNames = cursor.getColumnNames();
+            for (String name : columnNames) {
+                int columnIndex = cursor.getColumnIndex(name);
+                String value = cursor.getString(columnIndex);
+                Log.i(TAG, "onViewClicked: " + name + "-->" + value);
+            }
+        }*/
+    }
+
+    private void selectOne() {
+        //query(String table, String[] columns, String selection, String[] selectionArgs, String groupBy, String having, String orderBy)
+        String selection = "today = ?";
+        String[] selectionArgs = {"20190"};
+        Cursor cursor
+                = readableDatabase
+                .query(MySQLiteDBHelper.TABLE_NAME,
+                        null,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        null);
+        while (cursor.moveToNext()) {
+            String[] columnNames = cursor.getColumnNames();
+            for (String name : columnNames) {
+                int columnIndex = cursor.getColumnIndex(name);
+                String value = cursor.getString(columnIndex);
+                Log.i(TAG, "onViewClicked: " + name + "-->" + value);
+            }
+        }
+    }
+
+
 }

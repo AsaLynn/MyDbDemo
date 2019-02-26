@@ -17,10 +17,31 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="修改" />
+    <Button
+        android:id="@+id/btn_update2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="修改2" />
 
     <Button
         android:id="@+id/btn_select"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="查询" />
+    <Button
+        android:id="@+id/btn_select_one"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="查询指定字段值得所有数据" />
+    <Button
+        android:id="@+id/btn_select_single"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="查询指定字段值指定条件单条数据" />
+
+    <Button
+        android:id="@+id/btn_select_single2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="查询指定字段值指定条件单条数据2" />
 </LinearLayout>
