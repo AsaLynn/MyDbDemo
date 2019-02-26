@@ -1,5 +1,7 @@
 package com.zxn.dbdemo;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -9,9 +11,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.tbruyelle.rxpermissions2.RxPermissions;
+
+import java.io.File;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.functions.Consumer;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,19 +34,32 @@ public class MainActivity extends AppCompatActivity {
     private String TAG = this.getClass().getSimpleName();
     private SQLiteDatabase readableDatabase;
 
+    @SuppressLint("CheckResult")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        dbHelper = MySQLiteDBHelper.factory(getApplicationContext());
-        writableDatabase = dbHelper.getWritableDatabase();
-        readableDatabase = dbHelper.getReadableDatabase();
+        RxPermissions rxPermissions = new RxPermissions(this);
+        rxPermissions
+                .request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean aBoolean) throws Exception {
 
+                        onCreateDb();
+
+                    }
+                });
     }
 
-    //btn_select_single
+    private void onCreateDb() {
+        dbHelper = MySQLiteDBHelper.factory(this);
+        writableDatabase = dbHelper.getWritableDatabase();
+        readableDatabase = dbHelper.getReadableDatabase();
+    }
+
     @OnClick({R.id.btn_insert, R.id.btn_update, R.id.btn_update2, R.id.btn_select, R.id.btn_select_one, R.id.btn_select_single})
     public void onViewClicked(View view) {
         switch (view.getId()) {
