@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.tbruyelle.rxpermissions2.RxPermissions;
+import com.zcommon.lib.SdSpUtil;
 
 import java.io.File;
 
@@ -47,11 +48,18 @@ public class MainActivity extends AppCompatActivity {
                 .subscribe(new Consumer<Boolean>() {
                     @Override
                     public void accept(Boolean aBoolean) throws Exception {
-
                         onCreateDb();
-
+                        onInitSp();
                     }
                 });
+    }
+
+
+    private void onInitSp() {
+        SdSpUtil.configXmlPath(this.getPackageName());
+        SdSpUtil.saveData(this, "isOpen", true);
+        SdSpUtil.saveData(this, "code", 721);
+        SdSpUtil.saveData(this, "name", "zxn");
     }
 
     private void onCreateDb() {
